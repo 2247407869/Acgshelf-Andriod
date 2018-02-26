@@ -24,7 +24,7 @@ public class AnimeOpenHelper extends SQLiteOpenHelper {
                 + TableDefine.COLUMN_ANIME_ID + " TEXT, "
                 + TableDefine.COLUMN_ANIME_RANKING + " TEXT, "
                 + TableDefine.COLUMN_ANIME_SCORE + " TEXT, "
-                + TableDefine.COLUMN_ANIME_PNUM + " TEXT, "
+                + TableDefine.COLUMN_ANIME_PNUM + " INTEGER, "
                 + TableDefine.COLUMN_ANIME_NAME + " TEXT, "
                 + TableDefine.COLUMN_ANIME_FAXING + " TEXT, "
                 + TableDefine.COLUMN_ANIME_HUASHU + " TEXT, "

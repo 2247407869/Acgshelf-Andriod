@@ -163,6 +163,34 @@ public class AnimeDBHelper {
         }
         return animes;
     }
+//按评论人数分页查询动漫
+    public List<Animeitem.AnimeBean> getAnimesLimit_pnum(int curPage, int limit) {
+        db =  getReadableDB();
+        List<Animeitem.AnimeBean> animes = new ArrayList<>();
+        String startPos = String.valueOf(curPage * limit);  //数据开始位置
+        if(db != null) {
+            Cursor cursor = db.query(TableDefine.TABLE_ANIME,new String[] {
+                    TableDefine.COLUMN_ANIME_ID, TableDefine.COLUMN_ANIME_RANKING,
+                    TableDefine.COLUMN_ANIME_SCORE, TableDefine.COLUMN_ANIME_PNUM,
+                    TableDefine.COLUMN_ANIME_NAME, TableDefine.COLUMN_ANIME_FAXING,
+                    TableDefine.COLUMN_ANIME_HUASHU, "colour",
+            },null,null,null,null,TableDefine.COLUMN_ANIME_PNUM+ " desc",startPos + "," + limit);
+            while (cursor.moveToNext()) {
+                Animeitem.AnimeBean anime = new Animeitem.AnimeBean();
+                anime.setId(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_ID)));
+                anime.setRanking(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_RANKING)));
+                anime.setScore(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_SCORE)));
+                anime.setPnum(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_PNUM)));
+                anime.setName(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_NAME)));
+                anime.setFaxing(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_FAXING)));
+                anime.setHuashu(cursor.getString(cursor.getColumnIndex(TableDefine.COLUMN_ANIME_HUASHU)));
+                anime.setColour(cursor.getString(cursor.getColumnIndex("colour")));
+                animes.add(anime);
+            }
+            closeIO(cursor);
+        }
+        return animes;
+    }
 
     /** 查询所有动漫 */
     public List<Animeitem.AnimeBean> getAllAnimes() {

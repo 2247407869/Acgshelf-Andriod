@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                animebean.addAll(db.getAnimesLimit(page, 30));
+                animebean.addAll(db.getAnimesLimit_pnum(page, 30));
                 page++;
                 recycler_view.refreshComplete();
                 adapter.notifyDataSetChanged();
@@ -159,7 +159,8 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {//每次打开app、刷新的时候放置数据
 
 
-            animebean.addAll(db.getAnimesLimit(0,30));
+
+            animebean.addAll(db.getAnimesLimit_pnum(0,30));
 
     }
 
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                         db.insertAnimes(animeitem.getAnime());
                         animebean.clear();
-                        animebean.addAll(db.getAnimesLimit(0,30));
+                        animebean.addAll(db.getAnimesLimit_pnum(0,30));
                         adapter.notifyDataSetChanged();
 //                            mACache.put("animelist",response);
                     }
