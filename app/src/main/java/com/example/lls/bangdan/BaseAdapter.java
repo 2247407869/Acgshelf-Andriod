@@ -3,6 +3,7 @@ package com.example.lls.bangdan;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +50,18 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         holder.tv_text4.setText(animebean.get(position).getPnum()+"评论");
         holder.tv_text5.setText(animebean.get(position).getFaxing());
         holder.tv_text6.setText("rank "+animebean.get(position).getRanking());
-        if(animebean.get(position).getColour() != null)
-            holder.tv_text.setBackgroundColor(Color.parseColor("#00ff00"));
-        else holder.tv_text.setBackgroundColor(Color.parseColor("#ffffff"));
+        if(animebean.get(position).getColour()!=null) {
 
+            if (animebean.get(position).getColour().equals("red")) {
+                holder.tv_text.setBackgroundColor(Color.parseColor("#ff0000"));//red
+            }
+            if (animebean.get(position).getColour().equals("blue")) {
+                holder.tv_text.setBackgroundColor(Color.parseColor("#0000ff"));//blue
+            }
+            if (animebean.get(position).getColour().equals("green")) {
+                holder.tv_text.setBackgroundColor(Color.parseColor("#00ff00"));//green
+            }
+        }else holder.tv_text.setBackgroundColor(Color.parseColor("#ffffff"));
         setClickListener(holder,position);
     }
     //设置点击事件

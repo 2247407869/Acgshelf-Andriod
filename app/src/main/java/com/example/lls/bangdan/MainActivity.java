@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private Animeitem animeitem;
     private int page = 1;
     private int animenum = 0;
+    boolean firstopen = false;
     private Animeitem.AnimeBean anime = new Animeitem.AnimeBean();
     AnimeDBHelper db = AnimeDBHelper.getInstance();
 
@@ -56,9 +57,13 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         mACache =ACache.get(this);
 
+        animenum = db.getAnimesCount();//可以优化
+        if (animenum == 0 ){
+            anime.setName("第一次打开请稍候5秒");
+            animebean.add(anime);
+            getjson();
+        }else initData();
 
-
-        initData();
         initView();
     }
 
@@ -87,10 +92,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         String id = animebean.get(position).getId();//得到当前点击的动漫的bangumi id
-                        if(animebean.get(position).getColour() != null){
-                            db.updateColour(id, null);
-                            animebean.get(position).setColour(null);
-                        } else{
+                        if(animebean.get(position).getColour()!=null) {
+                            if (animebean.get(position).getColour().equals("green")) {
+                                db.updateColour(id, null);
+                                animebean.get(position).setColour(null);
+                            }
+                        }else {
+//                            Log.d("TAG", animebean.get(position).getColour());
                             db.updateColour(id, "green");
                             animebean.get(position).setColour("green");
                         }
@@ -135,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                animebean.clear();
+                if(animenum!=0)
+                    animebean.clear();
                 initData();
                 page = 1;
 
@@ -147,16 +156,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initData() {
+    private void initData() {//每次打开app、刷新的时候放置数据
 
-        animenum = db.getAnimesCount();//可以优化
-        if (animenum == 0 ){
-            getjson();
-            anime.setName("请稍等5秒左右后刷新列表");
-            animebean.add(anime);
-        }else {
+
             animebean.addAll(db.getAnimesLimit(0,30));
-        }
+
     }
 
     public void getjson(){
@@ -170,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
                         animeitem = JSON.parseObject(response.toString(), Animeitem.class);
 
                         db.insertAnimes(animeitem.getAnime());
+                        animebean.clear();
+                        animebean.addAll(db.getAnimesLimit(0,30));
+                        adapter.notifyDataSetChanged();
 //                            mACache.put("animelist",response);
                     }
                 },
