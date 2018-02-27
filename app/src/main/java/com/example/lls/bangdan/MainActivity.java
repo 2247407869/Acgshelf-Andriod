@@ -8,9 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -39,32 +43,54 @@ public class MainActivity extends AppCompatActivity {
     private List<Animeitem.AnimeBean> animebean = new LinkedList<>();
     private Context mContext;
     private BaseAdapter adapter;
-    private ACache mACache;
-    private JSONObject result;
     private Animeitem animeitem;
-    private int page = 1;
+    private int page = 0;
     private int animenum = 0;
-    boolean firstopen = false;
+    private int mode = 2;//需要更改
     private Animeitem.AnimeBean anime = new Animeitem.AnimeBean();
     AnimeDBHelper db = AnimeDBHelper.getInstance();
 
-
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_refresh);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+
         mContext = this;
-        mACache =ACache.get(this);
 
         animenum = db.getAnimesCount();//可以优化
         if (animenum == 0 ){
             anime.setName("第一次打开请稍候5秒");
             animebean.add(anime);
             getjson();
-        }else initData();
-
+        }else{
+            initData();
+        }
         initView();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(1,110,2,"按排名排序");
+        menu.add(1,111,1,"按评论人数排序");
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case 110:
+                mode = 1;
+                initData();
+                adapter.notifyDataSetChanged();
+                break;
+            case 111:
+                mode = 2;
+                initData();
+                adapter.notifyDataSetChanged();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initView() {
@@ -129,13 +155,19 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                animebean.addAll(db.getAnimesLimit_pnum(page, 30));
+                switch (mode){
+                    case 1:
+                        animebean.addAll(db.getAnimesLimit(page,30));
+                        break;
+                    case 2:
+                        animebean.addAll(db.getAnimesLimit_pnum(page,30));
+                        break;
+                }
                 page++;
                 recycler_view.refreshComplete();
                 adapter.notifyDataSetChanged();
             }
         },500);
-
     }
 
     private void refresh() {
@@ -143,11 +175,8 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(animenum!=0)
-                    animebean.clear();
-                initData();
-                page = 1;
 
+                initData();
 
                 recycler_view.refreshComplete();
                 adapter.notifyDataSetChanged();
@@ -156,11 +185,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initData() {//每次打开app、刷新的时候放置数据
-
-
-
-            animebean.addAll(db.getAnimesLimit_pnum(0,30));
+    private void initData() {//清空数据，页数清零，加载数据，刷新列表
+        animebean.clear();
+        switch (mode){
+            case 1:
+                animebean.addAll(db.getAnimesLimit(0,30));
+                break;
+            case 2:
+                animebean.addAll(db.getAnimesLimit_pnum(0,30));
+                break;
+        }
+        page=1;
 
     }
 
@@ -175,10 +210,9 @@ public class MainActivity extends AppCompatActivity {
                         animeitem = JSON.parseObject(response.toString(), Animeitem.class);
 
                         db.insertAnimes(animeitem.getAnime());
-                        animebean.clear();
-                        animebean.addAll(db.getAnimesLimit_pnum(0,30));
+                        initData();
                         adapter.notifyDataSetChanged();
-//                            mACache.put("animelist",response);
+
                     }
                 },
                 new Response.ErrorListener() {
