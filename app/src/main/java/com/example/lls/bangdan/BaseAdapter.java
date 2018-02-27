@@ -19,7 +19,7 @@ import java.util.List;
 public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> {
 
     private Context mContext;
-    private List<Animeitem.AnimeBean> animebean;
+    private List<AnimeBean> animebean;
 
     //自定义点击事件和长按事件
     private OnItemClickListener mOnItemClickListener;
@@ -30,7 +30,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
     }
 
     //构造器
-    public BaseAdapter(Context mContext, List<Animeitem.AnimeBean> animebean) {
+    public BaseAdapter(Context mContext, List<AnimeBean> animebean) {
         this.mContext = mContext;
         this.animebean = animebean;
     }
@@ -86,6 +86,11 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
                 return true;//返回true可以屏蔽点击监听的响应
             }
         });
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view, int position);
     }
 
     //总共多少个项

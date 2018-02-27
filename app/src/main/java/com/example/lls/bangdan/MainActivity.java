@@ -28,7 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.lls.bangdan.database.AnimeDBHelper;
+//import com.example.lls.bangdan.database.AnimeDBHelper;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -40,26 +40,31 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private XRecyclerView recycler_view;//https://github.com/jianghejie/XRecyclerView
-    private List<Animeitem.AnimeBean> animebean = new LinkedList<>();
+    private List<AnimeBean> animebean = new LinkedList<>();
     private Context mContext;
     private BaseAdapter adapter;
     private Animeitem animeitem;
     private int page = 0;
-    private int animenum = 0;
+    private long animenum = 0;
     private int mode = 2;//需要更改
-    private Animeitem.AnimeBean anime = new Animeitem.AnimeBean();
-    AnimeDBHelper db = AnimeDBHelper.getInstance();
+    private AnimeBean anime = new AnimeBean();
+    private AnimeBeanDao animeBeanDao;
+
+
+//    AnimeDBHelper db = AnimeDBHelper.getInstance();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_refresh);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
+
+        DaoSession daoSession = ((App) getApplication()).getDaoSession();
+        animeBeanDao = daoSession.getAnimeBeanDao();
 
         mContext = this;
 
-        animenum = db.getAnimesCount();//可以优化
+        animenum = animeBeanDao.count();//可以优化
         if (animenum == 0 ){
             anime.setName("第一次打开请稍候5秒");
             animebean.add(anime);
@@ -110,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         recycler_view.setLoadingMoreProgressStyle(ProgressStyle.SquareSpin);
         //点击动画
         final Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.alpha);
-        adapter.setOnItemClickListener(new OnItemClickListener() {
+        adapter.setOnItemClickListener(new BaseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, final int position) {
                 view.startAnimation(animation);
@@ -120,13 +125,12 @@ public class MainActivity extends AppCompatActivity {
                         String id = animebean.get(position).getId();//得到当前点击的动漫的bangumi id
                         if(animebean.get(position).getColour()!=null) {
                             if (animebean.get(position).getColour().equals("green")) {
-                                db.updateColour(id, null);
                                 animebean.get(position).setColour(null);
+                                animeBeanDao.update(animebean.get(position));
                             }
                         }else {
-//                            Log.d("TAG", animebean.get(position).getColour());
-                            db.updateColour(id, "green");
                             animebean.get(position).setColour("green");
+                            animeBeanDao.update(animebean.get(position));
                         }
                         adapter.notifyDataSetChanged();
                     }
@@ -157,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 switch (mode){
                     case 1:
-                        animebean.addAll(db.getAnimesLimit(page,30));
+                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Ranking).offset(30*page).limit(30).list());
                         break;
                     case 2:
-                        animebean.addAll(db.getAnimesLimit_pnum(page,30));
+                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Pnum).offset(30*page).limit(30).list());
                         break;
                 }
                 page++;
@@ -189,10 +193,10 @@ public class MainActivity extends AppCompatActivity {
         animebean.clear();
         switch (mode){
             case 1:
-                animebean.addAll(db.getAnimesLimit(0,30));
+                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Ranking).limit(30).list());
                 break;
             case 2:
-                animebean.addAll(db.getAnimesLimit_pnum(0,30));
+                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Pnum).limit(30).list());
                 break;
         }
         page=1;
@@ -208,8 +212,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         Log.d("TAG", response.toString());
                         animeitem = JSON.parseObject(response.toString(), Animeitem.class);
-
-                        db.insertAnimes(animeitem.getAnime());
+                        animeBeanDao.insertInTx(animeitem.getAnime());
                         initData();
                         adapter.notifyDataSetChanged();
 
