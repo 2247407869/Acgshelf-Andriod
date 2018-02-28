@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.LinkedList;
@@ -53,15 +54,15 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         if(animebean.get(position).getColour()!=null) {
 
             if (animebean.get(position).getColour().equals("red")) {
-                holder.tv_text.setBackgroundColor(Color.parseColor("#ff0000"));//red
+                holder.image.setBackgroundColor(Color.parseColor("#ff0000"));//red
             }
             if (animebean.get(position).getColour().equals("blue")) {
-                holder.tv_text.setBackgroundColor(Color.parseColor("#0000ff"));//blue
+                holder.image.setBackgroundColor(Color.parseColor("#0000ff"));//blue
             }
             if (animebean.get(position).getColour().equals("green")) {
-                holder.tv_text.setBackgroundColor(Color.parseColor("#00ff00"));//green
+                holder.image.setBackgroundColor(Color.parseColor("#00ff00"));//green
             }
-        }else holder.tv_text.setBackgroundColor(Color.parseColor("#ffffff"));
+        }else holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
         setClickListener(holder,position);
     }
     //设置点击事件
@@ -107,6 +108,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         TextView tv_text4;
         TextView tv_text5;
         TextView tv_text6;
+        ImageView image;
         public MyViewHolder(View itemView) {
             super(itemView);
             tv_text = (TextView) itemView.findViewById(R.id.tv_text);
@@ -115,6 +117,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
             tv_text4 = (TextView) itemView.findViewById(R.id.textView4);
             tv_text5 = (TextView) itemView.findViewById(R.id.textView5);
             tv_text6 = (TextView) itemView.findViewById(R.id.textView6);
+            image = (ImageView) itemView.findViewById(R.id.imageView);
         }
     }
 
