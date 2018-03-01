@@ -1,6 +1,8 @@
 package com.example.lls.bangdan;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private int mode = 2;//需要更改
     private AnimeBean anime = new AnimeBean();
     private AnimeBeanDao animeBeanDao;
+    private String color;
+    private int mposition;
 
 
 //    AnimeDBHelper db = AnimeDBHelper.getInstance();
@@ -122,17 +127,13 @@ public class MainActivity extends AppCompatActivity {
                 new Handler().post(new Runnable() {
                     @Override
                     public void run() {
-                        String id = animebean.get(position).getId();//得到当前点击的动漫的bangumi id
-                        if(animebean.get(position).getColour()!=null) {
-                            if (animebean.get(position).getColour().equals("green")) {
-                                animebean.get(position).setColour(null);
-                                animeBeanDao.update(animebean.get(position));
-                            }
-                        }else {
-                            animebean.get(position).setColour("green");
-                            animeBeanDao.update(animebean.get(position));
-                        }
-                        adapter.notifyDataSetChanged();
+                        mposition = position;
+                        color = animebean.get(position).getColour();
+                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                        if (color!=null)
+                            intent.putExtra("color", color);
+                        startActivityForResult(intent,0x123);
+
                     }
                 });
             }
@@ -152,6 +153,18 @@ public class MainActivity extends AppCompatActivity {
                 loadMore();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 0x123 && resultCode == 0x123)
+        {
+            color = data.getStringExtra("recolor");
+            animebean.get(mposition).setColour(color);
+            animeBeanDao.update(animebean.get(mposition));
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void loadMore() {

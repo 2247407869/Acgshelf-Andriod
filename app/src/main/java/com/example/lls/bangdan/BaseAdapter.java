@@ -52,18 +52,25 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         holder.tv_text5.setText(animebean.get(position).getFaxing());
         holder.tv_text6.setText("rank "+animebean.get(position).getRanking());
         if(animebean.get(position).getColour()!=null) {
-
-            if (animebean.get(position).getColour().equals("red")) {
-                holder.image.setBackgroundColor(Color.parseColor("#ff0000"));//red
-            }
-            if (animebean.get(position).getColour().equals("blue")) {
-                holder.image.setBackgroundColor(Color.parseColor("#0000ff"));//blue
-            }
-            if (animebean.get(position).getColour().equals("green")) {
-                holder.image.setBackgroundColor(Color.parseColor("#00ff00"));//green
+            switch (animebean.get(position).getColour()) {
+                case "1"://想看
+                    holder.image.setBackgroundColor(Color.parseColor("#FFE212"));//redfb7299bili
+                    break;
+                case "2"://看过
+                    holder.image.setBackgroundColor(Color.parseColor("#39C5BB"));//redfb7299bili
+                    break;
+                case "3"://在看
+                    holder.image.setBackgroundColor(Color.parseColor("#fb7299"));//redfb7299bili
+                    break;
+                case "4"://搁置
+                    holder.image.setBackgroundColor(Color.parseColor("#888888"));//redfb7299bili
+                    break;
+                case "5"://抛弃
+                    holder.image.setBackgroundColor(Color.parseColor("#0000FF"));//redfb7299bili
+                    break;
             }
         }else holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
-        setClickListener(holder,position);
+        setClickListener(holder, position);
     }
     //设置点击事件
     private void setClickListener(final MyViewHolder holder, int position) {

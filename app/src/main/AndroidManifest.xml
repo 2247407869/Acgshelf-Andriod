@@ -20,6 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:launchMode="singleTop"
+            android:name=".DetailActivity"/>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
 
