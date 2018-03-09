@@ -10,6 +10,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+
+import org.json.JSONObject;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +31,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
 
     private Context mContext;
     private List<AnimeBean> animebean;
+
 
     //自定义点击事件和长按事件
     private OnItemClickListener mOnItemClickListener;
@@ -44,13 +55,13 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
     }
     //为布局加载数据
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         holder.tv_text.setText(animebean.get(position).getName());
         holder.tv_text2.setText(animebean.get(position).getHuashu()+"集");
         holder.tv_text3.setText(animebean.get(position).getScore()+"分");
         holder.tv_text4.setText(animebean.get(position).getPnum()+"评论");
         holder.tv_text5.setText(animebean.get(position).getFaxing());
-        holder.tv_text6.setText("rank "+animebean.get(position).getRanking());
+        holder.tv_text6.setText(""+animebean.get(position).getRanking());
         if(animebean.get(position).getColour()!=null) {
             switch (animebean.get(position).getColour()) {
                 case "1"://想看
@@ -70,6 +81,10 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
                     break;
             }
         }else holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
+        String id = animebean.get(position).getFaxing();
+
+
+
         setClickListener(holder, position);
     }
     //设置点击事件
@@ -116,6 +131,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         TextView tv_text5;
         TextView tv_text6;
         ImageView image;
+        ImageView image2;
         public MyViewHolder(View itemView) {
             super(itemView);
             tv_text = (TextView) itemView.findViewById(R.id.tv_text);
@@ -125,6 +141,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
             tv_text5 = (TextView) itemView.findViewById(R.id.textView5);
             tv_text6 = (TextView) itemView.findViewById(R.id.textView6);
             image = (ImageView) itemView.findViewById(R.id.imageView);
+            image2 = (ImageView) itemView.findViewById(R.id.imageView2);
         }
     }
 

@@ -29,9 +29,10 @@ public class AnimeBean {
     private String faxing;
     private String huashu;
     private String colour;
-    @Generated(hash = 1162236439)
+    private String url;
+    @Generated(hash = 1295605776)
     public AnimeBean(String id, int ranking, String score, int pnum, String name,
-            String faxing, String huashu, String colour) {
+            String faxing, String huashu, String colour, String url) {
         this.id = id;
         this.ranking = ranking;
         this.score = score;
@@ -40,6 +41,7 @@ public class AnimeBean {
         this.faxing = faxing;
         this.huashu = huashu;
         this.colour = colour;
+        this.url = url;
     }
     @Generated(hash = 1637982863)
     public AnimeBean() {
@@ -91,5 +93,11 @@ public class AnimeBean {
     }
     public void setColour(String colour) {
         this.colour = colour;
+    }
+    public String getUrl() {
+        return this.url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

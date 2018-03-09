@@ -32,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 //import com.example.lls.bangdan.database.AnimeDBHelper;
+import com.bumptech.glide.Glide;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
@@ -239,5 +240,33 @@ public class MainActivity extends AppCompatActivity {
                 });
         mQueue.add(jsonObjectRequest);
     }
+
+    public void getbgmjson(String id){
+        RequestQueue mQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                "http://api.bgm.tv/subject/"+id, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("TAG", response.toString());
+                        BgmSub bgmsub = JSON.parseObject(response.toString(), BgmSub.class);
+//                        animeBeanDao.insertInTx(animeitem.getAnime());
+                        String url = bgmsub.getImages().getCommon();
+
+//                        initData();
+//                        adapter.notifyDataSetChanged();
+//                        Glide.with(mContext).load(url).into(holder.image2);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("TAG", error.getMessage(), error);
+                    }
+                });
+        mQueue.add(jsonObjectRequest);
+    }
+
+
 }
 
