@@ -56,12 +56,14 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
     //为布局加载数据
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        holder.tv_text.setText(animebean.get(position).getName());
-        holder.tv_text2.setText(animebean.get(position).getHuashu()+"集");
-        holder.tv_text3.setText(animebean.get(position).getScore()+"分");
-        holder.tv_text4.setText(animebean.get(position).getPnum()+"评论");
-        holder.tv_text5.setText(animebean.get(position).getFaxing());
-        holder.tv_text6.setText(""+animebean.get(position).getRanking());
+        if(animebean.get(position).getName_cn().equals(""))
+            holder.tv_text.setText(animebean.get(position).getName());
+        else holder.tv_text.setText(animebean.get(position).getName_cn());
+        holder.tv_text2.setText(animebean.get(position).getEps_count()+"集");
+        holder.tv_text3.setText(animebean.get(position).getRating_score()+"分");
+        holder.tv_text4.setText(animebean.get(position).getCollection_collect()+"补完");
+        holder.tv_text5.setText(animebean.get(position).getAir_date());
+        holder.tv_text6.setText(""+animebean.get(position).getRank());
         if(animebean.get(position).getColour()!=null) {
             switch (animebean.get(position).getColour()) {
                 case "1"://想看
@@ -81,10 +83,8 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
                     break;
             }
         }else holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
-        String id = animebean.get(position).getFaxing();
-
-
-
+        String url = animebean.get(position).getImages_small();
+        Glide.with(mContext).load(url).into(holder.image2);
         setClickListener(holder, position);
     }
     //设置点击事件

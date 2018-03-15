@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         animenum = animeBeanDao.count();//可以优化
         if (animenum == 0 ){
-            anime.setName("第一次打开请稍候5秒");
+            anime.setName_cn("第一次打开请稍候5秒");
             animebean.add(anime);
             getjson();
         }else{
@@ -175,10 +175,10 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 switch (mode){
                     case 1:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Ranking).offset(30*page).limit(30).list());
+                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
                         break;
                     case 2:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Pnum).offset(30*page).limit(30).list());
+                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
                         break;
                 }
                 page++;
@@ -207,10 +207,10 @@ public class MainActivity extends AppCompatActivity {
         animebean.clear();
         switch (mode){
             case 1:
-                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Ranking).limit(30).list());
+                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
                 break;
             case 2:
-                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Pnum).limit(30).list());
+                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
                 break;
         }
         page=1;
@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue mQueue = Volley.newRequestQueue(this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 "http://acgshelf.wang/test_api", null,
+//                "http://10.0.2.2/1/test_api", null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
