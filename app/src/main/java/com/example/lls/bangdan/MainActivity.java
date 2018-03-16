@@ -173,8 +173,6 @@ public class MainActivity extends AppCompatActivity {
         {
             color = data.getStringExtra("recolor");
             animebean.get(mposition).setColour(color);
-            animeBeanDao.update(animebean.get(mposition));
-            initData();
             adapter.notifyDataSetChanged();
         }
     }
@@ -222,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
+                animeBeanDao.updateInTx(animebean);
                 initData();
 
                 recycler_view.refreshComplete();
