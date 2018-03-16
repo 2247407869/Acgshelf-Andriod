@@ -64,25 +64,29 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         holder.tv_text4.setText(animebean.get(position).getCollection_collect()+"补完");
         holder.tv_text5.setText(animebean.get(position).getAir_date());
         holder.tv_text6.setText(""+animebean.get(position).getRank());
-        if(animebean.get(position).getColour()!=null) {
+        if(animebean.get(position).getColour()!=null){
             switch (animebean.get(position).getColour()) {
+                case "0":
+                    holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
+                    break;
                 case "1"://想看
-                    holder.image.setBackgroundColor(Color.parseColor("#FFE212"));//redfb7299bili
+                    holder.image.setBackgroundColor(Color.parseColor("#FFE212"));
                     break;
                 case "2"://看过
-                    holder.image.setBackgroundColor(Color.parseColor("#39C5BB"));//redfb7299bili
+                    holder.image.setBackgroundColor(Color.parseColor("#39C5BB"));
                     break;
                 case "3"://在看
-                    holder.image.setBackgroundColor(Color.parseColor("#fb7299"));//redfb7299bili
+                    holder.image.setBackgroundColor(Color.parseColor("#fb7299"));
                     break;
                 case "4"://搁置
-                    holder.image.setBackgroundColor(Color.parseColor("#888888"));//redfb7299bili
+                    holder.image.setBackgroundColor(Color.parseColor("#888888"));
                     break;
                 case "5"://抛弃
-                    holder.image.setBackgroundColor(Color.parseColor("#0000FF"));//redfb7299bili
+                    holder.image.setBackgroundColor(Color.parseColor("#0000FF"));
                     break;
             }
-        }else holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
+        }
+
         String url = animebean.get(position).getImages_small();
         Glide.with(mContext).load(url).into(holder.image2);
         setClickListener(holder, position);

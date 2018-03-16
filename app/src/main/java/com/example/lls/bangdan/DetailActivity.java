@@ -70,7 +70,7 @@ public class DetailActivity extends AppCompatActivity {
                         color = "5";
                         break;
                     case R.id.radioButton6:
-                        color = null;
+                        color = "0";
                         break;
                 }
                 intent2.putExtra("recolor",color);

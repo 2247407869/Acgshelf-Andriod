@@ -36,6 +36,8 @@ import com.bumptech.glide.Glide;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
+import org.greenrobot.greendao.query.Query;
+import org.greenrobot.greendao.query.WhereCondition;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private int page = 0;
     private long animenum = 0;
     private int mode = 2;//需要更改
+    private int filtrate = 0;
     private AnimeBean anime = new AnimeBean();
     private AnimeBeanDao animeBeanDao;
     private String color;
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         animenum = animeBeanDao.count();//可以优化
         if (animenum == 0 ){
-            anime.setName_cn("第一次打开请稍候5秒");
+            anime.setName_cn("第一次打开请稍候10秒");
             animebean.add(anime);
             getjson();
         }else{
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(1,110,2,"按排名排序");
         menu.add(1,111,1,"按评论人数排序");
+        menu.add(1,120,3,"隐藏/显示已看和抛弃");
         return true;
     }
 
@@ -97,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 111:
                 mode = 2;
+                initData();
+                adapter.notifyDataSetChanged();
+                break;
+            case 120:
+                if(filtrate == 1) filtrate = 0;
+                else filtrate = 1;
                 initData();
                 adapter.notifyDataSetChanged();
                 break;
@@ -164,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             color = data.getStringExtra("recolor");
             animebean.get(mposition).setColour(color);
             animeBeanDao.update(animebean.get(mposition));
+            initData();
             adapter.notifyDataSetChanged();
         }
     }
@@ -173,12 +184,30 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switch (mode){
-                    case 1:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
+                switch (filtrate){
+                    case 0:
+                        switch (mode){
+                            case 1:
+                                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
+                                break;
+                            case 2:
+                                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
+                                break;
+                        }
                         break;
-                    case 2:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
+                    case 1:
+                        switch (mode){
+                            case 1:
+                                animebean.addAll(animeBeanDao.queryBuilder().where(
+                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
+                                ).orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
+                                break;
+                            case 2:
+                                animebean.addAll(animeBeanDao.queryBuilder().where(
+                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
+                                ).orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
+                                break;
+                        }
                         break;
                 }
                 page++;
@@ -205,12 +234,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {//清空数据，页数清零，加载数据，刷新列表
         animebean.clear();
-        switch (mode){
-            case 1:
-                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
+        switch (filtrate){
+            case 0:
+                switch (mode){
+                    case 1:
+                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
+                        break;
+                    case 2:
+                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
+                        break;
+                }
                 break;
-            case 2:
-                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
+            case 1:
+                switch (mode){
+                    case 1:
+                        animebean.addAll(animeBeanDao.queryBuilder().where(
+                                AnimeBeanDao.Properties.Colour.notIn("2","5")
+                        ).orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
+                        break;
+                    case 2:
+                        animebean.addAll(animeBeanDao.queryBuilder().where(
+                                AnimeBeanDao.Properties.Colour.notIn("2","5")
+                        ).orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
+                        break;
+                }
                 break;
         }
         page=1;
@@ -227,6 +274,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         Log.d("TAG", response.toString());
                         animeitem = JSON.parseObject(response.toString(), Animeitem.class);
+                        for(int i=0;i<animeitem.getAnime().size();i++){
+                            animeitem.getAnime().get(i).setColour("0");
+                        }
                         animeBeanDao.insertInTx(animeitem.getAnime());
                         initData();
                         adapter.notifyDataSetChanged();
