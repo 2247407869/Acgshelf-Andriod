@@ -265,8 +265,7 @@ public class MainActivity extends AppCompatActivity {
     public void getjson(){
         RequestQueue mQueue = Volley.newRequestQueue(this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                "http://acgshelf.wang/test_api", null,
-//                "http://10.0.2.2/1/test_api", null,
+                "http://acgshelf.wang/api/anime", null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -290,31 +289,31 @@ public class MainActivity extends AppCompatActivity {
         mQueue.add(jsonObjectRequest);
     }
 
-    public void getbgmjson(String id){
-        RequestQueue mQueue = Volley.newRequestQueue(this);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                "http://api.bgm.tv/subject/"+id, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("TAG", response.toString());
-                        BgmSub bgmsub = JSON.parseObject(response.toString(), BgmSub.class);
-//                        animeBeanDao.insertInTx(animeitem.getAnime());
-                        String url = bgmsub.getImages().getCommon();
-
-//                        initData();
-//                        adapter.notifyDataSetChanged();
-//                        Glide.with(mContext).load(url).into(holder.image2);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("TAG", error.getMessage(), error);
-                    }
-                });
-        mQueue.add(jsonObjectRequest);
-    }
+//    public void getbgmjson(String id){
+//        RequestQueue mQueue = Volley.newRequestQueue(this);
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+//                "http://api.bgm.tv/subject/"+id, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        Log.d("TAG", response.toString());
+//                        BgmSub bgmsub = JSON.parseObject(response.toString(), BgmSub.class);
+////                        animeBeanDao.insertInTx(animeitem.getAnime());
+//                        String url = bgmsub.getImages().getCommon();
+//
+////                        initData();
+////                        adapter.notifyDataSetChanged();
+////                        Glide.with(mContext).load(url).into(holder.image2);
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("TAG", error.getMessage(), error);
+//                    }
+//                });
+//        mQueue.add(jsonObjectRequest);
+//    }
 
 
 }
