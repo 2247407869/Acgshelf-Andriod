@@ -30,7 +30,7 @@ import java.util.List;
 public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> {
 
     private Context mContext;
-    private List<AnimeBean> animebean;
+    private List<AnimeSubject.DataBean> animebean;
 
 
     //自定义点击事件和长按事件
@@ -42,7 +42,7 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
     }
 
     //构造器
-    public BaseAdapter(Context mContext, List<AnimeBean> animebean) {
+    public BaseAdapter(Context mContext, List<AnimeSubject.DataBean> animebean) {
         this.mContext = mContext;
         this.animebean = animebean;
     }
@@ -64,28 +64,28 @@ public class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.MyViewHolder> 
         holder.tv_text4.setText(animebean.get(position).getCollection_collect()+"补完");
         holder.tv_text5.setText(animebean.get(position).getAir_date());
         holder.tv_text6.setText(""+animebean.get(position).getRank());
-        if(animebean.get(position).getColour()!=null){
-            switch (animebean.get(position).getColour()) {
-                case "0":
-                    holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
-                    break;
-                case "1"://想看
-                    holder.image.setBackgroundColor(Color.parseColor("#FFE212"));
-                    break;
-                case "2"://看过
-                    holder.image.setBackgroundColor(Color.parseColor("#39C5BB"));
-                    break;
-                case "3"://在看
-                    holder.image.setBackgroundColor(Color.parseColor("#fb7299"));
-                    break;
-                case "4"://搁置
-                    holder.image.setBackgroundColor(Color.parseColor("#888888"));
-                    break;
-                case "5"://抛弃
-                    holder.image.setBackgroundColor(Color.parseColor("#0000FF"));
-                    break;
-            }
-        }
+//        if(animebean.get(position).getColour()!=null){
+//            switch (animebean.get(position).getColour()) {
+//                case "0":
+//                    holder.image.setBackgroundColor(Color.parseColor("#ffffff"));
+//                    break;
+//                case "1"://想看
+//                    holder.image.setBackgroundColor(Color.parseColor("#FFE212"));
+//                    break;
+//                case "2"://看过
+//                    holder.image.setBackgroundColor(Color.parseColor("#39C5BB"));
+//                    break;
+//                case "3"://在看
+//                    holder.image.setBackgroundColor(Color.parseColor("#fb7299"));
+//                    break;
+//                case "4"://搁置
+//                    holder.image.setBackgroundColor(Color.parseColor("#888888"));
+//                    break;
+//                case "5"://抛弃
+//                    holder.image.setBackgroundColor(Color.parseColor("#0000FF"));
+//                    break;
+//            }
+//        }
 
         String url = animebean.get(position).getImages_small();
         Glide.with(mContext).load(url).into(holder.image2);

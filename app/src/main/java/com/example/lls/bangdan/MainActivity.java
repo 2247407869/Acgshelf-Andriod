@@ -44,13 +44,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class MainActivity extends AppCompatActivity {
     private XRecyclerView recycler_view;//https://github.com/jianghejie/XRecyclerView
-    private List<AnimeBean> animebean = new LinkedList<>();
+    private List<AnimeSubject.DataBean> animebean = new LinkedList<>();
     private Context mContext;
     private BaseAdapter adapter;
-    private Animeitem animeitem;
-    private int page = 0;
+    private AnimeSubject animeitem;
+//    private int page = 1;
     private long animenum = 0;
     private int mode = 2;//需要更改
     private int filtrate = 0;
@@ -58,7 +68,10 @@ public class MainActivity extends AppCompatActivity {
     private AnimeBeanDao animeBeanDao;
     private String color;
     private int mposition;
+    int loadMore_page = 2;
 
+    public static final String TAG ="=======================";
+    public static final String BASE_URL = "http://acgshelf.wang/api/";
 
 //    AnimeDBHelper db = AnimeDBHelper.getInstance();
 
@@ -67,20 +80,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_refresh);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        DaoSession daoSession = ((App) getApplication()).getDaoSession();
-        animeBeanDao = daoSession.getAnimeBeanDao();
-
         mContext = this;
-
-        animenum = animeBeanDao.count();//可以优化
-        if (animenum == 0 ){
-            anime.setName_cn("第一次打开请稍候10秒");
-            animebean.add(anime);
-            getjson();
-        }else{
-            initData();
-        }
+        getdatas(1);
         initView();
     }
 
@@ -135,18 +136,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, final int position) {
                 view.startAnimation(animation);
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mposition = position;
-                        color = animebean.get(position).getColour();
-                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                        if (color!=null)
-                            intent.putExtra("color", color);
-                        startActivityForResult(intent,0x123);
-
-                    }
-                });
+//                new Handler().post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mposition = position;
+//                        color = animebean.get(position).getColour();
+//                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+//                        if (color!=null)
+//                            intent.putExtra("color", color);
+//                        startActivityForResult(intent,0x123);
+//
+//                    }
+//                });
             }
 
             @Override
@@ -166,116 +167,89 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 0x123 && resultCode == 0x123)
-        {
-            color = data.getStringExtra("recolor");
-            animebean.get(mposition).setColour(color);
-            adapter.notifyDataSetChanged();
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode == 0x123 && resultCode == 0x123)
+//        {
+//            color = data.getStringExtra("recolor");
+//            animebean.get(mposition).setColour(color);
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
 
     private void loadMore() {
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switch (filtrate){
-                    case 0:
-                        switch (mode){
-                            case 1:
-                                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
-                                break;
-                            case 2:
-                                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
-                                break;
-                        }
-                        break;
-                    case 1:
-                        switch (mode){
-                            case 1:
-                                animebean.addAll(animeBeanDao.queryBuilder().where(
-                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
-                                ).orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
-                                break;
-                            case 2:
-                                animebean.addAll(animeBeanDao.queryBuilder().where(
-                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
-                                ).orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
-                                break;
-                        }
-                        break;
-                }
-                page++;
+                getdatas(loadMore_page);
+                loadMore_page++;
                 recycler_view.refreshComplete();
-                adapter.notifyDataSetChanged();
+//                switch (filtrate){
+//                    case 0:
+//                        switch (mode){
+//                            case 1:
+//                                animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
+//                                break;
+//                            case 2:
+//                                animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
+//                                break;
+//                        }
+//                        break;
+//                    case 1:
+//                        switch (mode){
+//                            case 1:
+//                                animebean.addAll(animeBeanDao.queryBuilder().where(
+//                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
+//                                ).orderAsc(AnimeBeanDao.Properties.Rank).offset(30*page).limit(30).list());
+//                                break;
+//                            case 2:
+//                                animebean.addAll(animeBeanDao.queryBuilder().where(
+//                                        AnimeBeanDao.Properties.Colour.notIn("2","5")
+//                                ).orderDesc(AnimeBeanDao.Properties.Collection_collect).offset(30*page).limit(30).list());
+//                                break;
+//                        }
+//                        break;
+//                }
+//                page++;
+//                recycler_view.refreshComplete();
+//                adapter.notifyDataSetChanged();
             }
         },500);
     }
 
     private void refresh() {
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                animeBeanDao.updateInTx(animebean);
-                initData();
-
+                animebean.clear();
+                getdatas(1);
+                loadMore_page = 2;//让加载更多重归第二页
                 recycler_view.refreshComplete();
-                adapter.notifyDataSetChanged();
+//                animeBeanDao.updateInTx(animebean);
+//                initData();
+//
+//                recycler_view.refreshComplete();
+//                adapter.notifyDataSetChanged();
             }
         },500);
-
     }
 
     private void initData() {//清空数据，页数清零，加载数据，刷新列表
-        animebean.clear();
-        switch (filtrate){
-            case 0:
-                switch (mode){
-                    case 1:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
-                        break;
-                    case 2:
-                        animebean.addAll(animeBeanDao.queryBuilder().orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
-                        break;
-                }
-                break;
-            case 1:
-                switch (mode){
-                    case 1:
-                        animebean.addAll(animeBeanDao.queryBuilder().where(
-                                AnimeBeanDao.Properties.Colour.notIn("2","5")
-                        ).orderAsc(AnimeBeanDao.Properties.Rank).limit(30).list());
-                        break;
-                    case 2:
-                        animebean.addAll(animeBeanDao.queryBuilder().where(
-                                AnimeBeanDao.Properties.Colour.notIn("2","5")
-                        ).orderDesc(AnimeBeanDao.Properties.Collection_collect).limit(30).list());
-                        break;
-                }
-                break;
-        }
-        page=1;
+//        animebean.clear();
 
     }
 
     public void getjson(){
         RequestQueue mQueue = Volley.newRequestQueue(this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                "http://acgshelf.wang/api/anime", null,
+                "http://acgshelf.wang/api/animes", null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("TAG", response.toString());
-                        animeitem = JSON.parseObject(response.toString(), Animeitem.class);
-                        for(int i=0;i<animeitem.getAnime().size();i++){
-                            animeitem.getAnime().get(i).setColour("0");
-                        }
-                        animeBeanDao.insertInTx(animeitem.getAnime());
-                        initData();
+                        animeitem = JSON.parseObject(response.toString(), AnimeSubject.class);
+                        animebean.addAll(animeitem.getData());
                         adapter.notifyDataSetChanged();
 
                     }
@@ -287,6 +261,38 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         mQueue.add(jsonObjectRequest);
+    }
+
+    public void getdatas(int page) {
+
+        //步骤4:创建Retrofit对象
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+        AnimeService animeService = retrofit.create(AnimeService.class);
+        animeService.getTop30(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<AnimeSubject>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.e(TAG, "onCompleted: ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(AnimeSubject animeSubject) {
+                        animebean.addAll(animeSubject.getData());
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
 //    public void getbgmjson(String id){
@@ -314,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
 //                });
 //        mQueue.add(jsonObjectRequest);
 //    }
-
 
 }
 
